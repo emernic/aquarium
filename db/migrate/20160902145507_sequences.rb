@@ -8,14 +8,14 @@ class Sequences < ActiveRecord::Migration
       t.timestamps
     end    
 
-    create_table :versions do |t|
+    create_table :sequence_versions do |t|
       t.integer :sequence_id 
       t.integer :parent_id
       t.text :data
       t.timestamps
     end
 
-    create_table :feature do |t|
+    create_table :features do |t|
       t.integer :super_id
       t.integer :sub_id
       t.string :name

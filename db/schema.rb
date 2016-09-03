@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160615161649) do
+ActiveRecord::Schema.define(:version => 20160902145507) do
 
   create_table "account_logs", :force => true do |t|
     t.integer  "row1"
@@ -98,6 +98,13 @@ ActiveRecord::Schema.define(:version => 20160615161649) do
 
   add_index "data_associations", ["upload_id"], :name => "index_data_associations_on_upload_id"
 
+  create_table "features", :force => true do |t|
+    t.integer "super_id"
+    t.integer "sub_id"
+    t.string  "name"
+    t.string  "type"
+  end
+
   create_table "field_types", :force => true do |t|
     t.integer  "parent_id"
     t.string   "name"
@@ -161,9 +168,9 @@ ActiveRecord::Schema.define(:version => 20160615161649) do
     t.string   "user_id"
     t.string   "sha"
     t.text     "arguments"
-    t.text     "state",               :limit => 2147483647
-    t.datetime "created_at",                                :null => false
-    t.datetime "updated_at",                                :null => false
+    t.text     "state",              :limit => 2147483647
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
     t.string   "path"
     t.integer  "pc"
     t.integer  "group_id"
@@ -171,7 +178,6 @@ ActiveRecord::Schema.define(:version => 20160615161649) do
     t.datetime "desired_start_time"
     t.datetime "latest_start_time"
     t.integer  "metacol_id"
-    t.integer  "workflow_process_id"
   end
 
   create_table "locators", :force => true do |t|
@@ -298,6 +304,21 @@ ActiveRecord::Schema.define(:version => 20160615161649) do
     t.string   "field7"
     t.string   "field8"
     t.text     "data"
+  end
+
+  create_table "sequence_versions", :force => true do |t|
+    t.integer  "sequence_id"
+    t.integer  "parent_id"
+    t.text     "data"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "sequences", :force => true do |t|
+    t.boolean  "circular"
+    t.boolean  "single_stranded"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "takes", :force => true do |t|
