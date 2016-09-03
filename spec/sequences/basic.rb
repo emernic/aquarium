@@ -6,18 +6,30 @@ RSpec.describe Sequence, :type => :model do
     it "makes sequences and features" do
 
       s = Sequence.new circular: false, single_stranded: false
-      s.save
 
       s.data = "ATCCGGC"
       s.data = "TTCCGGC"
 
-      f = Sequence.new circular: false, single_stranded: false
-      f.save
-      f.data = "CCGG"
+      puts "s = #{s.latest}"
+      puts "previous = #{s.previous}"
 
-      s.associate_feature f, name: "thing", type: "plain"
+      s.add_feature "CCGG", "thing", "plain"
 
-      puts s
+      puts "---------------"
+      puts "s = #{s}"
+      puts "s.features:"
+      s.features.each do |f|
+        puts "  #{f.name}: #{f.latest}"
+      end
+
+      c = s.copy
+
+      puts "---------------"
+      puts "c = #{c}"
+      puts "c.features:"      
+      c.features.each do |f|
+        puts "  #{f.name}: #{f.latest}"        
+      end
 
     end
 

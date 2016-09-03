@@ -102,7 +102,7 @@ ActiveRecord::Schema.define(:version => 20160902145507) do
     t.integer "super_id"
     t.integer "sub_id"
     t.string  "name"
-    t.string  "type"
+    t.string  "category"
   end
 
   create_table "field_types", :force => true do |t|

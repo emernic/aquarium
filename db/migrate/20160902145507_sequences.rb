@@ -19,7 +19,7 @@ class Sequences < ActiveRecord::Migration
       t.integer :super_id
       t.integer :sub_id
       t.string :name
-      t.string :type
+      t.string :category
     end
 
   end
