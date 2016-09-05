@@ -1,0 +1,14 @@
+<h1>Sequences</h1>
+
+<table class='table' style='width: 100%; table-layout: fixed'>
+  <% @sequences.each do |sequence| %>
+    <tr>
+      <td style='width: 5%'><%= link_to sequence.id, sequence %></td>
+      <td style='word-wrap: break-word; overflow: wrap'><%= sequence.latest.data =%></td>
+    </tr>
+  <% end %>
+  <tr>
+    <td><%= link_to "New", new_sequence_path, class: "btn btn-small" %></td>
+    <td></td>
+  </tr>
+</table>

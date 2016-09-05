@@ -1,5 +1,7 @@
 Bioturk::Application.routes.draw do
 
+  resources :sequences
+
   get '/developer',                              to: 'developer#developer'
   post '/developer/get/',                        to: 'developer#get'  
   post '/developer/save',                        to: 'developer#save'    

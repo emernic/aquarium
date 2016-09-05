@@ -31,6 +31,7 @@ gem 'jquery-ui-rails', '~> 4.2.1'
 gem 'jquery-datatables-rails'
 gem 'jquery-cookie-rails'
 gem "jquery-fileupload-rails"
+gem 'jquery-caret-rails', '~> 1.0.0'
 
 gem "flot-rails"
 

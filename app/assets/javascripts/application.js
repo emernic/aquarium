@@ -23,6 +23,7 @@
 //= require jquery.flot
 //= require jquery.flot.resize
 //= require jquery.flot.time
+//= require jquery.caret
 //= require underscore
 //= require d3
 //= require joint.nojquery

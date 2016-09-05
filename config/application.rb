@@ -2,6 +2,7 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
+require './lib/dna/dna'
 require './lib/pdl/core/pdl'
 require './lib/lang/lang'
 require './lib/plankton/plankton'

@@ -1,0 +1,14 @@
+<div ng-app="aquarium" class='sequence'>
+
+  <div ng-controller='sequenceCtrl as seq'>
+
+    <div ng-repeat="block in sequence.blocks track by $index">
+      <input class="block" type=text ng-model="block" ng-change="change(block,$index)" id="input_{{$index}}"></input>
+      <label class='index'>{{$index*width}}</label>
+    </div>
+
+    <!-- <pre>{{sequence|json}}</pre> -->
+
+  </div>
+
+</div>
