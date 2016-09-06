@@ -1,5 +1,6 @@
 Bioturk::Application.routes.draw do
 
+  post '/sequences/:id/upload',                  to: 'sequences#upload'
   resources :sequences
 
   get '/developer',                              to: 'developer#developer'

@@ -37,16 +37,41 @@ class Sequence < ActiveRecord::Base
     new_sequence
   end
 
+  def from_ape file
+
+    parser = DNA::ApeParser.new(file)
+    seq = parser.parse
+
+    self.single_stranded = !seq[:double_stranded]
+    self.circular = seq[:circular]
+    self.data = seq[:sequence]
+
+    feature_list = DNA.extract_ape_features(seq)
+
+    feature_list.each do |f|
+      self.add_feature f[:sequence], f[:label], f[:category], circular: false, single_stranded: self.single_stranded
+    end
+
+  end
+
   def all
     sequence_versions
   end
 
   def latest
-    sequence_versions.last
+    if sequence_versions.empty?
+      nil
+    else
+      sequence_versions.last
+    end
   end
 
   def previous
-    sequence_versions.last.parent
+    if sequence_versions.length > 1
+      sequence_versions.last.parent
+    else
+      nil
+    end
   end
 
   def to_s

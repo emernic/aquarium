@@ -11,21 +11,33 @@
   w.controller('sequenceCtrl', [ '$scope', '$http', '$attrs', '$location', function ($scope,$http,$attrs,$location) {
 
     var id = window.location.pathname.split('/')[2];
-    $scope.width = 128;
+    $scope.width = 100;
 
-    $http.get("/sequences/" + id + ".json").then(function(response) {
+    function setup(data) {
 
-      $scope.sequence = response.data;
-      $scope.sequence.latest = $scope.sequence.sequence_versions[$scope.sequence.sequence_versions.length-1];
+      $scope.sequence = data;
+      var n = $scope.sequence.sequence_versions.length;
+      if ( n > 0 ) {
+        $scope.sequence.latest = $scope.sequence.sequence_versions[n-1];
+      } else {
+        $scope.sequence.latest = { data: "" };
+      }
       blockulate();
 
+    }
+
+    $http.get("/sequences/" + id + ".json").then(function(response) {
+      setup(response.data);
     });
 
     function blockulate() {
       $scope.sequence.blocks = [];
       for ( var i=0; i<$scope.sequence.latest.data.length; i += $scope.width) {
         $scope.sequence.blocks.push($scope.sequence.latest.data.slice(i,i+$scope.width));
-      }      
+      }
+      if ( $scope.sequence.blocks.length == 0 ) {
+        $scope.sequence.blocks.push("");
+      }
     }
 
     $scope.change = function(block,i) {
@@ -53,7 +65,29 @@
 
     }
 
+    $scope.ape_upload = function() {
 
-  }])
+      var f = document.getElementById('ape-file').files[0],
+          r = new FileReader();
+
+      r.onloadend = function(e) {
+        var data = e.target.result;
+
+        $http.post("/sequences/" + $scope.sequence.id + "/upload.json", { file: data}).then(function(response) {
+          console.log(response.data);
+          if ( response.data.error ) {
+            alert("Could not parse ape file: " + JSON.stringify(response.data.error) );
+          } else {
+            setup(response.data);
+          }
+        });
+
+      }
+
+      r.readAsBinaryString(f);
+
+    }    
+
+  }]);
 
 })();

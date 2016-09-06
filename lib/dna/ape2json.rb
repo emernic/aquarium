@@ -11,4 +11,4 @@ file.close
 parser = DNA::ApeParser.new content
 seq = parser.parse
 puts seq
-puts DNA.extract_features(seq)
+puts DNA.extract_ape_features(seq)

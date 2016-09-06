@@ -2,8 +2,8 @@ module DNA
 
   def self.reverse_complement seq
 
-    rc = { "A" => "T", "T" => "A", "C" => "G", "G" => "C" }
-    seq.split('').reverse.collect { |c| rc[c].capitalize }.join('')
+    rc = { "A" => "T", "T" => "A", "C" => "G", "G" => "C", "a" => "t", "t" => "a", "c" => "g", "g" => "c", "N" => "N", "n" => "n" }
+    seq.split('').reverse.collect { |c| rc[c] }.join('')
 
   end
 
@@ -12,10 +12,15 @@ module DNA
     features = []
 
     ape[:features].each do |feature|
-      a = feature[:range][0]
-      b = feature[:range][1]
+      if feature[:range]
+        a = feature[:range][0]
+        b = feature[:range][1]
+      else
+        a,b, = [0,1]
+      end
       features << {
-        name: feature[:label],
+        label: feature[:label],
+        category: feature[:category],
         sequence: (feature[:complement] ? reverse_complement(ape[:sequence][a,b-a]) : ape[:sequence][a,b-a])
       }
     end

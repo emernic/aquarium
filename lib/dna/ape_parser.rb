@@ -30,6 +30,7 @@ module DNA
     end
 
     def locus
+
       @t.eat "LOCUS"
       @t.eat
       @t.eat
@@ -40,13 +41,17 @@ module DNA
       while @t.current != "EOL"
         @t.eat
       end
+
     end
 
     def features
+
       @t.eat "FEATURES"
+
       while @t.current != "ORIGIN"
-        if @t.current == "misc_feature"
-          @t.eat
+
+        if [ "misc_feature", "site", "CDS", "promoter", "terminator", "gene", "primer_bind", "ligation", "AD", "NLS", "rep_origin" ].member? @t.current
+          category = @t.eat
           if @t.current =~ /complement/
             range = @t.eat.split('complement(')[1].split(')')[0].split('..').collect { |str| str.to_i }
             comp = true
@@ -56,14 +61,18 @@ module DNA
           end
         elsif @t.current =~ /label/
           label = @t.eat.split('=')[1]
-          @result[:features] << { range: range, label: label, compliment: comp }
+          @result[:features] << { range: range, label: label, complement: comp, category: category }
+          puts({ range: range, label: label, complement: comp })
         else
           @t.eat
         end
+
       end
+
     end
 
     def origin
+
       @t.eat "ORIGIN"
       while @t.current != '//'
         if @t.current =~ /\d+/ || @t.current == "EOL"
@@ -72,7 +81,9 @@ module DNA
           @result[:sequence] += @t.eat
         end
       end
+
       @t.eat '//'
+
     end
 
   end

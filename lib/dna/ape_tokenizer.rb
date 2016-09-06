@@ -4,6 +4,7 @@ module DNA
 
     def initialize content
       @tokens = content.gsub(/\n/,' EOL ').gsub(/\s+/m, ' ').strip.split(" ")
+      @tokens << "EOF"
       @index = 0
     end
 
@@ -19,6 +20,9 @@ module DNA
       raise "expected #{str} at token #{current}" if str && current != str
       temp = current
       @index += 1
+      if @index > @tokens.length
+        raise "ran out of tokens!"
+      end
       temp
     end
 
