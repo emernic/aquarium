@@ -1,0 +1,52 @@
+<div ng-app="aquarium" class='sequence'>
+
+  <div ng-controller='sequenceCtrl as seq'>
+
+    <div class='two-column' ng-if="sequence.latest">
+
+      <div class='two-column-left space'>
+
+        <div class='info'>
+
+          <b>Sequence {{sequence.id}}</b>
+
+          <ul>
+            <li ng-repeat="feature in sequence.features">
+              {{feature.name}} ({{feature.category}})
+              {{location(feature)}}
+            </li>
+          </ul>
+
+        </div>
+
+
+        <div ng-if="sequence.latest.data==''">
+          <input type=file id="ape-file" file="ape_file"/>
+          <a href='#' class='btn' ng-click="ape_upload()">Import Ape File</a>
+        </div>
+
+      </div>
+
+      <div class='two-column-right'>
+
+        <div class="sequence-data" contenteditable="true">
+          <span ng-repeat="base in sequence.latest.data track by $index"
+                ng-class="highlight_color($index)">{{base}}</span>
+        </div>
+
+<!--         <div ng-repeat="block in sequence.blocks track by $index" class="row-fluid">
+          <div class="span1 index">{{$index*width}}</div>
+          <div class='span11'>
+            <input class="block" type=text ng-model="block" ng-change="change(block,$index)" id="input_{{$index}}"></input>
+          </div>
+        </div> -->
+
+      </div>
+
+    </div>
+
+    <!-- <pre>{{sequence.features|json}}</pre> -->
+
+  </div>
+
+</div>

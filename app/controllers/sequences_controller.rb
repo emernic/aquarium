@@ -10,9 +10,10 @@ class SequencesController < ApplicationController
         @sequences = Sequence.includes(:features, :sequence_versions).all
       end
 
-      format.json do 
-        render json: Sequence.includes(:sequence_versions).all
-                             .as_json(include: [:features, :sequence_versions])
+      format.json do
+        render json: Sequence.includes( :sequence_versions, :features)
+                             .all
+                             .as_json( include: [ :features, :sequence_versions ] )
       end
 
     end    
@@ -23,7 +24,9 @@ class SequencesController < ApplicationController
 
     respond_to do |format|
 
-      format.html
+      format.html { 
+        render layout: 'browser' 
+      }
 
       format.json do
         render json: Sequence.includes(:sequence_versions, features: { sub: :sequence_versions })
@@ -47,13 +50,13 @@ class SequencesController < ApplicationController
 
     sequence = Sequence.find(params[:id])
 
-    # begin
+    begin
       sequence.from_ape(params[:file])
       redirect_to sequence_path(id: sequence.id, format: :json)
-    # rescue Exception => e
-      # logger.info e
-      # render json: { error: e }
-    # end   
+    rescue Exception => e
+      logger.info e
+      render json: { error: e.message, backtrace: e.backtrace }
+    end   
 
   end
 

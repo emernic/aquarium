@@ -1,9 +1,10 @@
 <h1>Sequences</h1>
 
 <table class='table' style='width: 100%; table-layout: fixed'>
-  <% @sequences.each do |sequence| %>
+  <% @sequences.select { |s| s.features.length > 0 }.each do |sequence| %>
     <tr>
       <td style='width: 5%'><%= link_to sequence.id, sequence %></td>
+      <td style='width: 5%'><%= sequence.features.length %></td>
       <td style='word-wrap: break-word; overflow: wrap'>
         <%= sequence.latest ? sequence.latest.data[0..50] + '...' : 'empty' =%> 
       </td>

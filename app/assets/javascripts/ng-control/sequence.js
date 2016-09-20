@@ -88,6 +88,23 @@
 
     }    
 
+    $scope.location = function(feature) {
+      var s = feature.sub.sequence_versions[0].data;
+      var i = $scope.sequence.latest.data.indexOf(s);
+      return [ i, i+s.length-1 ]
+    }
+
+    $scope.highlight_color = function(i) {
+      var c = "highlight";
+      aq.each($scope.sequence.features,function(f) {
+        var r = $scope.location(f);
+        if ( r[0] < i && i < r[1] ) {
+          c += "-x";
+        }
+      });
+      return c;
+    }
+
   }]);
 
 })();
