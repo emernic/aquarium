@@ -1,53 +1,39 @@
 <% provide(:title,  'Inventory') %>
 
-<h1>Objects</h1>
+<div ng-app="aquarium" ng-controller="objectTypesCtrl as object_types" class='object_types'>
 
+  <div class='two-column'>
 
+    <div class='two-column-left'>
+      <div class='two-column-control'>
+        <h4>Object Types</h4>
+        <ul>
+         <li ng-repeat="handler in handlers">
+           <a href="#" class="clickable" ng-click="$parent.current_handler = handler">{{handler}}</a>
+         </li>
+        </ul>
+      </div>  
 
-<table class="table">
-  <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <% if @handler == 'collection' %>
-      <th>Collection Dimensions</th>
-    <% end %>
-    <th>Quantity</th>
-    <th>Range</th>
-    <th><span class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @handler %><b class="caret"></b></a>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-      <% @all_handlers.sort.each do |u| %>
-        <li><%= link_to u, '/object_types?handler=' + u %></li>
-      <% end %>
-    </ul>
-  </span>
-  </th>
-    <th></th>
-  </tr>
+      <div class='two-column-control' ng-if="errors.length > 0">
+        <h4>Errors</h4>
+        {{errors}}
+      </div>             
 
-<% @object_types.each do |object_type| %>
-  <tr>
-    <td><%= link_to object_type.name, object_type %></td>
-    <td><%= object_type.description %></td>
-    <% if @handler == 'collection' %>
-      <td><%= object_type.rows %>&times;<%= object_type.columns %></th>
-    <% end %>
-    <td>
-      <% if object_type.quantity < object_type.min %>
-        <span class="text-error">
-      <% else %>
-        <span class="text-success">
-      <% end %>
-      <%= pluralize( object_type.quantity, object_type.unit ) %>
-      </span>
-    </td>
-    <td><%= "[" + object_type.min.to_s + ", " + object_type.max.to_s + "]" %></td>
-    <td><%= object_type.handler %></td>
-    <td><%= link_to 'Edit', edit_object_type_path(object_type) %></td>
-  </tr>
-<% end %>
-</table>
+    </div>
 
-<br />
+    <div class='two-column-right'>
 
-<%= link_to 'New Object type', new_object_type_path, class: "btn" %>
+      <div class='spanner-row border-top' ng-repeat="object_type in object_types | filter: { handler: current_handler }">
+        <opener model="object_type.open"></opener>
+        <spanner w=90 p=20>{{object_type.name}}</spanner>
+        <div class='spanner-row' ng-if="object_type.open">
+          {{object_type}}
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
