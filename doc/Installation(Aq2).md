@@ -68,7 +68,11 @@ To install sqlite3 and mysql on mac
     brew install sqlite3
     brew install mysql
 
-Install mysql (or comment out mysql in GemFile): https://gist.github.com/nrollr/a8d156206fa1e53c6cd6
+Install mysql: https://gist.github.com/nrollr/a8d156206fa1e53c6cd6. You may need to install Xcode command tools if you
+are getting weird errors. Run:
+
+    xcode-select --install
+    gem install mysql2
 
 Install bundler
 
@@ -136,10 +140,28 @@ Initialize the first user by opening a rails counsel:
 
 Go to 0.0.0.0:3000 and login with account
 
+If you do not have admin access, you may need to manually create a new membership.
+
+    m = Membership.new
+    m.group_id = Group.find_by_name('admin').id
+    m.user_id = User.first.id
+    m.save
+
+    
+      technician_group = Group.new
+      technician_group.name = 'technicians'
+      technician_group.description = "A group containing technicians"
+      technician_group.save
+
+
+
 Go to "Groups" and create group "technicians"
 
 Create a budget
 
+In one strange error involving homebrew and rails counsel, I had to run the following
+
+    ln -s /usr/local/opt/readline/lib/libreadline.7.0.dylib /usr/local/opt/readline/lib/libreadline.6.dylib
 
 #### Killing the server server
 

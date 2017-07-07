@@ -16,6 +16,22 @@ def make_user name, login, password, opts={}
   m.user_id = user.id
   m.save
 
+  if user.admin
+    m = Membership.new
+    m.group_id = Group.find_by_name('admin')
+    m.user_id = user.id
+    m.save
+  end
+
   user
 
 end
+
+def initialize
+  technician_group = Group.new
+  technician_group.name = 'technicians'
+  technician_group.description = "A group containing technicians"
+  technician_group.save
+end
+
+
