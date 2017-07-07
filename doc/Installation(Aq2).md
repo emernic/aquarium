@@ -47,18 +47,36 @@ Configuring aquarium
 
 Go to aquarium/config/initializers and do
 
+	cd config/initializers
 	cp aquarium_template.notrb aquarium.rb
 	
 Go to aquarium/config and do
 
+	cd ..
 	cp database_template.yml database.yml
 
 You may edit the database.yml to configure your particular database
 
 For development with sqlit3, add the following to your gem file
 
+    cd ..
     echo 'gem "sqlite3"' >> GemFile
     echo 'gem "test-unit"' >> GemFile
+
+To install sqlite3 and mysql on mac
+
+    brew install sqlite3
+    brew install mysql
+
+Install mysql (or comment out mysql in GemFile): https://gist.github.com/nrollr/a8d156206fa1e53c6cd6
+
+Install bundler
+
+    gem install bundler
+
+Install mysql gem
+
+    gem install mysql
 
 You can install all the gems
 
