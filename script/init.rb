@@ -28,10 +28,12 @@ def make_user name, login, password, opts={}
 end
 
 def initialize
-  technician_group = Group.new
-  technician_group.name = 'technicians'
-  technician_group.description = "A group containing technicians"
-  technician_group.save
+  if not Group.exists?(name: "technicians")
+    technician_group = Group.new
+    technician_group.name = 'technicians'
+    technician_group.description = "A group containing technicians"
+    technician_group.save
+  end
 end
 
 
