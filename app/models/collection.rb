@@ -21,7 +21,7 @@ class Collection < Item
   end
 
   def position s
-    pos = self.get_where self.to_sample_id(s)
+    pos = self.find self.to_sample_id(s)
     pos.first
   end
 
@@ -71,8 +71,13 @@ class Collection < Item
     self.matrix = (Array.new(r,Array.new(c,EMPTY)))
   end
 
+  def include? x
+    sel = self.find x
+    sel.any?
+  end
+
   # Finds rows, cols in which block is true
-  def matrix_where
+  def select
     raise "need selection block" unless block_given?
     self.matrix.map.with_index do |row, r|
       cols_where = row.each_index.select { |i| Proc.new.call(row[i]) }
@@ -81,25 +86,26 @@ class Collection < Item
   end
 
   # Finds rows, cols that equal val
-  def get_where val
-    self.matrix_where { |x| x == self.to_sample_id(val) }
+  def find val
+    self.select { |x| x == self.to_sample_id(val) }
   end
 
   # Gets all empty rows, cols
   def get_empty
-    self.matrix_where { |x| x == EMPTY }
+    self.select { |x| x == EMPTY }
   end
 
   # Gets all non-empty rows, cols
   def get_non_empty
-    self.matrix_where { |x| x != EMPTY }
+    self.select { |x| x != EMPTY }
   end
 
   def num_samples
     get_non_empty.size
   end
 
-  # Changes Item, String, or Sample to a sample.id for storing into a collection matrix
+  # Changes Item, String, or Sample to a sample.id for storing into a collection matrix. Maybe should be private
+  # class method?
   def to_sample_id x
     r = EMPTY
     case
@@ -146,6 +152,9 @@ class Collection < Item
     else
       r, c = self.get_empty.first
     end
+    if r.nil? or c.nil?
+      return nil
+    end
     self.set r, c, x
     [r, c, x]
   end
@@ -158,14 +167,18 @@ class Collection < Item
     opts = { reverse: true }.merge(options)
     r, c = [nil, nil]
     sel = self.get_non_empty
-    sel = self.get_where x if not x.nil?
+    sel = self.find x if not x.nil?
+    if sel.empty?
+      return nil
+    end
     if opts[:reverse]
       r,c = sel.last
     else
       r,c = sel.first
     end
+    s = self.matrix[r][c]
     self.set r, c, EMPTY
-    [r, c, x]
+    [r, c, s]
   end
 
   def capacity
@@ -177,10 +190,11 @@ class Collection < Item
     self.get_empty.empty?
   end
 
+  def empty?
+    self.get_non_empty.empty?
+  end
+
   def set r, c, x
-    if self.full?
-      raise "Cannot set, collection is full (#{self.num_samples} samples)"
-    end
     m = self.matrix
     d = self.dimensions
     if r >= d[0] or c >= d[1]
