@@ -334,25 +334,38 @@ class OperationTypesController < ApplicationController
   def import
 
     ots = []
+    error = false
 
-    begin 
-      
-      issues_list = params[:operation_types].collect { |x|
-        OperationType.import(x.merge(deployed: false))
-      }
+    ActiveRecord::Base.transaction do
 
-      render json: { 
-        operation_types: issues_list.collect { |issues| issues[:object_type] }.collect { |ot| 
-          ot.as_json(methods: [:field_types, :protocol, :precondition, :cost_model, :documentation, :timing]) 
-        },
-        notes: issues_list.collect { |issues| issues[:notes] }.flatten,
-        inconsistencies: issues_list.collect { |issues| issues[:inconsistencies] }.flatten
-      }
+      begin 
+        
+        issues_list = params[:operation_types].collect { |x|
+          OperationType.import(x.merge(deployed: false))
+        }
 
-    rescue Exception => e
+        notes = issues_list.collect { |issues| issues[:notes] }.flatten
+        inconsistencies = issues_list.collect { |issues| issues[:inconsistencies] }.flatten
+        error = true if inconsistencies.any?
 
-      ots.each { |ot| ot.destroy }
-      render json: { error: "Rails could not import operation types: " + e.to_s + ": " + e.backtrace.to_s }
+        notes << "Import canceled due to inconsistencies. No changes made." if inconsistencies.any?
+
+        render json: { 
+          operation_types: issues_list.collect { |issues| issues[:object_type] }.collect { |ot| 
+            ot.as_json(methods: [:field_types, :protocol, :precondition, :cost_model, :documentation, :timing]) 
+          },
+          notes: notes.uniq,
+          inconsistencies: inconsistencies.uniq
+        }
+
+      rescue Exception => e
+
+        error = true 
+        render json: { error: "Rails could not import operation types: " + e.to_s + ": " + e.backtrace.to_s, issues_list: issues_list }
+
+      end
+
+      raise ActiveRecord::Rollback if error      
 
     end
 
