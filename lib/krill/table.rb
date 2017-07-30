@@ -86,8 +86,13 @@ module Krill
     # @param [Array] columns An array of column names, as in [:x, :y, :z].    
     # @return [Table] The table, can be chained.
     def choose columns
+      columns.map! { |c| c.to_sym }
       @choice = columns
       self
+    end
+
+    def choice
+      @choice
     end
 
     # Define the row to start with in a subsequent call to render.
