@@ -48,3 +48,5 @@ gem 'oj'
 gem 'angular_rails_csrf'
 
 gem 'rack-cors', :require => 'rack/cors'
+gem "sqlite3"
+gem "test-unit"
