@@ -42,19 +42,21 @@ fi
 
 
 # Restart Servers
-echo ""
-echo "Restarting servers..."
+#echo ""
+#echo "Restarting servers..."
 RAILS_ENV=$env rails s &
 rails runner "Krill::Server.new.run(3500)" &
-jobs
+#wait
+jobs &
 
-# Wait 5 seconds
+## Wait 5 seconds
 for i in {1..50}
 do
   echo -ne '.'
   sleep .1
 done
 
-# Open Aquarium Webpage
+## Open Aquarium Webpage
 printf "\n\n================\nOpening Aquarium\n"
 open "http://$host:$aqport"
+wait
