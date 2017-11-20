@@ -1,6 +1,10 @@
 Installation (Aq2, MacOS)
 ============
 
+Install script: `scripts/install.sh`
+
+`rake init:initialize[name,login,password,admin]`
+
 Requirements
 ---
 ### Ruby & rbenv

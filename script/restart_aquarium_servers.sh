@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #!/bin/bash
 env="development"
 host="0.0.0.0"
