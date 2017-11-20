@@ -5,6 +5,8 @@ Install script: `scripts/install.sh`
 
 `rake init:initialize[name,login,password,admin]`
 
+Restart servers: `scripts/restart_servers.sh`
+
 Requirements
 ---
 ### Ruby & rbenv
