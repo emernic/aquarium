@@ -83,6 +83,12 @@ class JsonController < ApplicationController
 
     record.save
 
+    if params[:model][:model] == "DataAssociation" && record.parent_class == "Plan"
+      Operation.step(Plan.find(record.parent_id)
+                         .operations
+                         .reject { |op| ['done', 'error', 'scheduled', 'running'].member?(op.status) })
+    end
+
     if record.errors.empty?
       render json: record
     else
@@ -132,7 +138,7 @@ class JsonController < ApplicationController
 
         items = Item.includes(locator: :wizard)
                     .where("object_type_id = ? AND location != 'deleted'", ot.id)
-                    .limit(100)
+                    .limit(25)
 
         render json: items
 

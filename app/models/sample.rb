@@ -1,3 +1,5 @@
+# A named, biologically unique definition for an instance of a {SampleType}, such as a specific Primer, Fragment, Plasmid, or Yeast Strain
+
 class Sample < ActiveRecord::Base
 
   include ActionView::Helpers::DateHelper
@@ -112,7 +114,9 @@ class Sample < ActiveRecord::Base
                 fv.value = raw_fv[:value]
               end
 
+              puts "before fv saved: {fv.inspect}"
               fv.save
+              puts "fv saved. now #{fv.inspect}"
 
               unless fv.errors.empty? 
                 errors.add :field_value, "Could not save field #{raw_fv[:name]}: #{stringify_errors(fv.errors)}"
@@ -135,6 +139,11 @@ class Sample < ActiveRecord::Base
 
   end
 
+  # Return all items of this {Sample} in the provided {ObjectType}
+  # @param container [String] {ObjectType} name
+  # @example Find a 1 kb ladder for gel electrophoresis
+  #   ladder_1k = Sample.find_by_name("1 kb Ladder").in("Ladder Aliquot")
+  # @return [Array<Item>]
   def in container
 
     c = ObjectType.find_by_name container
@@ -150,6 +159,8 @@ class Sample < ActiveRecord::Base
     "<a href='/samples/#{self.id}' class='aquarium-item' id='#{self.id}'>#{self.id}</a>"
   end
 
+  # Return {User} who owns this {Sample}
+  # @return [User]
   def owner
     u = User.find_by_id(self.user_id)
     if u
@@ -184,5 +195,19 @@ class Sample < ActiveRecord::Base
   def data_hash
     JSON.parse(self.data,symbolize_names:true)
   end
+
+  def full_json
+
+    sample_hash = self.as_json(
+            include: { sample_type: { include: :object_types, methods: :field_types } },
+            methods: :full_field_values
+          )
+
+    # rename field for compatibility with ng-control/sample.js
+    sample_hash[:field_values] = sample_hash.delete :full_field_values 
+
+    sample_hash
+      
+  end   
 
 end

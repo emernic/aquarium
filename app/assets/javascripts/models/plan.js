@@ -72,8 +72,12 @@ AQ.Plan.record_methods.save = function(user) {
 AQ.Plan.load = function(id) {
   return new Promise((resolve,reject) => {
     AQ.get("/plans/" + id + ".json").then(response => {   
-      var up = AQ.Plan.record(response.data).marshall();
-      resolve(up);
+      try {
+        var up = AQ.Plan.record(response.data).marshall();
+        resolve(up);
+      } catch (error) {
+        reject(error)
+      }
     })
   });
 }
@@ -153,6 +157,8 @@ AQ.Plan.record_methods.estimate_cost = function() {
         });
       });
 
+      plan.base_module.compute_cost(plan);
+
       plan.estimating = false;
 
     });
@@ -188,7 +194,7 @@ AQ.Plan.record_getters.costs = function() {
           }
         }
       })
-    })
+    });
 
   });
 
@@ -381,7 +387,7 @@ AQ.Plan.record_methods.propagate_up = function(fv,sid) { // propogate sid to inc
 
 }
 
-AQ.Plan.record_methods.propagate = function(op,fv,sid) { // propagate the choice of sid for fv to connected operations 
+AQ.Plan.record_methods.propagate_aux = function(op,fv,sid) { // propagate the choice of sid for fv to connected operations 
 
   var plan = this;
 
@@ -390,14 +396,14 @@ AQ.Plan.record_methods.propagate = function(op,fv,sid) { // propagate the choice
     aq.each(op.field_values,io => {
       if ( fv.route_compatible(io) ) {
         plan.propagate_down(io,sid)
-        plan.propagate_up(io,sid);
+        plan.propagate_up(io,sid)
       }  
     })
 
   } else {
 
-    plan.propagate_down(fv,sid)
-    plan.propagate_up(fv,sid)
+    plan.propagate_down(fv,sid);
+    plan.propagate_up(fv,sid);
 
   }
 
@@ -405,6 +411,41 @@ AQ.Plan.record_methods.propagate = function(op,fv,sid) { // propagate the choice
 
 }
 
+AQ.Plan.record_methods.propagate = function(op,fv,sid) {
+
+  var plan = this;
+
+  plan.propagate_aux(op, fv, sid);
+
+  aq.each(plan.siblings(fv), sibling => {
+    sibling.op.assign_sample(sibling.fv,sid) 
+    sibling.op.instantiate(plan,sibling.fv,sid) 
+    plan.propagate_aux(sibling.op, sibling.fv, sid);
+  });
+
+}
+
+AQ.Plan.record_methods.siblings = function(fv) {
+
+  var plan = this,
+      from_module_io,
+      sibs = [];
+
+  aq.each(plan.base_module.all_wires, wire => {
+    if ( wire.to == fv && wire.from_module ) {
+      from_module_io = wire.from;
+    } 
+  });
+
+  aq.each(plan.base_module.all_wires, wire => {
+    if ( wire.to != fv && wire.to.record_type == "FieldValue" && wire.from == from_module_io ) {
+      sibs.push({ fv: wire.to, op: wire.to_op });
+    }
+  });
+
+  return sibs;
+
+}
 
 AQ.Plan.record_methods.add_wire_from = function(fv,op,pred) {
 
@@ -475,7 +516,6 @@ AQ.Plan.record_methods.debug = function() {
 
     AQ.get("/plans/" + plan.id + "/debug").then(
       response => {
-        console.log(response);
         plan.reload();
         plan.debugging = false;
         plan.recompute_getter("state");
@@ -635,17 +675,30 @@ AQ.Plan.record_getters.state = function() {
 
   // if all ops are done, the done
   var not_done = aq.where(plan.operations, op => op.status != "done" );
+  var errors = aq.where(plan.operations, op => op.status == "error" );
+  var delays = aq.where(plan.operations, op => op.status == "delayed" );
 
   if ( not_done.length == 0 ) {
     plan.state = "Done";
-  } else {
-    var errors = aq.where(plan.operations, op => op.status == "error" );
-    if ( errors.length > 0 ) {
-      plan.state = "Error"
-    }
+  } else if ( errors.length > 0 ) {
+    plan.state = "Error";
+  } else if ( delays.length > 0 ) {
+    plan.state = "Delayed";
   }
 
   return plan.state;
+
+}
+
+AQ.Plan.record_methods.find_items = function() {
+
+  var plan = this;
+
+  aq.each(plan.operations, op => {
+    aq.each(op.field_values, fv => {
+      fv.recompute_getter("items")
+    })
+  })
 
 }
 
@@ -663,3 +716,112 @@ AQ.Plan.record_methods.replan = function() {
 
 }
 
+AQ.Plan.record_methods.find_by_rid = function(rid) {
+
+  var plan = this, 
+      object = null;
+
+  aq.each(plan.operations, op => {
+    if ( op.rid == rid ) {
+      object = op;
+    } else {
+      aq.each(op.field_values, fv => {
+        if ( fv.rid == rid ) {
+          object = fv;
+        }
+      })
+    }
+  })
+
+  return object;
+
+}
+
+AQ.Plan.record_methods.find_by_id = function(id) {
+
+  var plan = this, 
+      object = null;
+
+  aq.each(plan.operations, op => {
+    if ( op.id == id ) {
+      object = op;
+    } else {
+      aq.each(op.field_values, fv => {
+        if ( fv.id == id ) {
+          object = fv;
+        }
+      })
+    }
+  })
+
+  return object;
+
+}
+
+AQ.Plan.record_methods.add_wire = function(from, from_op, to, to_op) {
+
+  if ( from.role == 'output' && from.field_type.can_produce(to) ) {
+    if ( ! this.reachable(to, from ) ) {
+      this.wires.push(AQ.Wire.make({
+        from_op: from_op,
+        from: from,
+        to_op: to_op,
+        to: to,
+        snap: AQ.snap
+      }));
+    } else {
+      alert("Cycle detected. Cannot create wire.")
+    }
+  } else if ( to.field_type.can_produce(from) ) {
+    if ( ! this.reachable(from,to) ) {
+      this.wires.push(AQ.Wire.make({
+        to_op: from_op,
+        to: from,
+        from_op: to_op,
+        from: to,
+        snap: AQ.snap
+      }));
+    } else {
+      alert("Cycle detected. Cannot create wire.")
+    }
+  }
+
+}
+
+AQ.Plan.record_methods.num_plan_wires_into = function(io) {
+
+  var plan = this;
+  return aq.where(plan.wires, w => w.to.rid == io.rid).length;
+
+}
+
+AQ.Plan.record_methods.num_module_wires_into = function(io) {
+
+  return this.base_module.num_wires_into(io);
+}
+
+AQ.Plan.record_methods.num_wires_into = function(io) {
+
+  var plan = this;
+  return plan.num_plan_wires_into(io) + plan.num_module_wires_into(io);
+
+}
+
+AQ.Plan.record_methods.recount_fv_wires = function() {
+
+  var plan = this;
+
+  aq.each(plan.operations, op => {
+    aq.each(op.field_values, fv => {
+      fv.num_wires = 0;
+    })
+  })  
+
+  aq.each(plan.wires, w => {
+    w.from.num_wires++;
+    w.to.num_wires++;
+  })
+
+
+
+}

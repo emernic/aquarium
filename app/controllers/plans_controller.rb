@@ -77,7 +77,7 @@ class PlansController < ApplicationController
   end
 
   def operation_types
-    render json: Serialize.fast_operation_types
+    render json: Serialize.fast_operation_types(params[:deployed_only])
   end
 
   # End Planner GUI
@@ -137,7 +137,7 @@ class PlansController < ApplicationController
 
   def destroy
     plan = Plan.find(params[:id])
-    plan.remove 
+    plan.remove
     render json: {}
   end
 

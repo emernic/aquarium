@@ -1,4 +1,7 @@
-class Operation < ActiveRecord::Base
+ # Class that represents an operation in the lab
+ # Some very important methods include {#input}, {#output}, {#error}, {#pass}
+
+ class Operation < ActiveRecord::Base
 
   include DataAssociator
   include FieldValuer
@@ -17,20 +20,23 @@ class Operation < ActiveRecord::Base
   has_many :plan_associations
   has_many :plans, through: :plan_associations
 
-  attr_accessible :status, :user_id, :x, :y
+  attr_accessible :status, :user_id, :x, :y, :parent_id
 
   def virtual?
     false
   end
 
+  # @return [String] OperationType name
   def name
     operation_type.name
   end
 
+  # @return [Bool] Whether OperationType is on-the-fly
   def on_the_fly
     operation_type.on_the_fly
   end
 
+  # @return [Plan] The plan that contains this Operation
   def plan
     pset = plans
     if pset.length > 0
@@ -40,20 +46,39 @@ class Operation < ActiveRecord::Base
     end
   end
 
+  # Assigns a Sample to an input
+  # @param name [String]
+  # @param val [Sample]
+  # @param aft [AllowableFieldType]
   def set_input name, val, aft=nil
     set_property name, val, "input", false, aft
   end
 
+  # Assigns a Sample to an output
+  # @param name [String]
+  # @param val [Sample]
+  # @param aft [AllowableFieldType]
   def set_output name, val, aft=nil
     set_property name, val, "output", false, aft
   end
 
+  # Adds a new input to an operation, even if that operation doesn't specify the input
+  # in its definition. Useful for example when an operation determines which enzymes it
+  # will use once launched.
+  # @param name [String]
+  # @param sample [Sample]
+  # @param container [ObjectType]
+  # @example Add input for items to discard
+  #   items.each do |i|
+  #     items_in_inputs = op.inputs.map { |input| input.item }.uniq
+  # 
+  #     if not items_in_inputs.include? i
+  #       n = "Discard Item #{i.id}"
+  #       op.add_input n, i.sample, i.object_type
+  #       op.input(n).set item: i
+  #     end
+  #   end
   def add_input name, sample, container 
-
-    # Adds a new input to an operation, even if that operation doesn't specify the input
-    # in its definition. Useful for example when an operation determines which enzymes it
-    # will use once launched.
-      
     items = Item.where(sample_id: sample.id, object_type_id: container.id).reject { |i| i.deleted? }
     
     if items.any?
@@ -86,43 +111,63 @@ class Operation < ActiveRecord::Base
       
   end  
 
+  # @return [Array<FieldValue>]
   def inputs
     field_values.select { |ft| ft.role == 'input' }
   end
 
+  # (see #inputs)
   def outputs
     field_values.select { |ft| ft.role == 'output' }
   end
 
+  # @param name [String]
+  # @return [FieldValue]
   def get_input name
     puts "================= FINDING #{name}"
     inputs.find { |i| i.name == name }
   end
 
+  # (see #get_input)
   def get_output name
     outputs.find { |o| o.name == name }
   end
 
+  # (see #get_input)
   def input name
     get_input name
   end
 
+  # (see #get_input)
   def output name
     get_output name
   end
 
+  # Inputs as Array extended with {#IOList}
+  # @param name [String]
+  # @return [Array<FieldValue>]
   def input_array name
     inputs.select { |i| i.name == name }.extend(IOList)
   end
 
+  # Outputs as Array extended with {#IOList}
+  # @param name [String]
+  # @return [Array<FieldValue>]
   def output_array name
     outputs.select { |o| o.name == name } .extend(IOList)   
   end
 
+  # @param name [String]
+  # @param role [String]
+  # @return [FieldValue]
   def get_field_value name, role="input"
     field_values.find { |fv| fv.name == name && fv.role == role }
   end
 
+  # Passes an input item to an output (alternative to {Krill::OperationList#make})
+  # @param input_name [String]
+  # @param output_name [String]
+  # @return [Operation]
   def pass input_name, output_name=nil
 
     output_name = input_name unless output_name
@@ -207,7 +252,7 @@ class Operation < ActiveRecord::Base
 
     inputs.each do |input|
       input.predecessors.each do |pred|        
-        ops << pred.operation if pred.operation.status == "primed"
+        ops << pred.operation if pred.operation && pred.operation.status == "primed"
       end
     end
 
@@ -251,7 +296,7 @@ class Operation < ActiveRecord::Base
 
     if !ops
       ops = Operation.includes(:operation_type)
-                     .where("status = 'waiting' OR status = 'deferred'")
+                     .where("status = 'waiting' OR status = 'deferred' OR status = 'delayed' OR status = 'pending'")
     end
 
     ops.each do |op|

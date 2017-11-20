@@ -12,28 +12,21 @@
 
       link: function($scope,$element,$attributes) {
 
-        var fv = $scope.fv,
-            ft = $scope.fv.field_type,
-            op = $scope.operation,
-            plan = $scope.plan,
-            op_type = op.operation_type,
-            route = op.routing;    
-
         var autocomp = function(ev,ui) {
+
+          var fv = $scope.fv,
+              ft = $scope.fv.field_type,
+              op = $scope.operation,
+              plan = $scope.plan,
+              op_type = op.operation_type,
+              route = op.routing;              
 
           // respond when a new sample is chosen from the autocomplete
 
           var sid = ui.item.value;
 
           op.assign_sample(fv, sid);
-
-          // send new sid to i/o of other operations
-          plan.propagate(op,fv,ui.item.value);
-
-          // use sample information to fill in inputs, if possible
-          if ( fv.role == 'output' ) {
-            op.instantiate(plan,fv,sid);
-          }
+          op.instantiate(plan,fv,sid);
 
           if ( ft.array ) {
 
@@ -61,13 +54,45 @@
 
           }
 
+          plan.propagate(op,fv,ui.item.value);       
+
           $scope.$apply();
 
-        }   
+        }  
+
+        var change = function(ev,ui)  {
+
+          var fv = $scope.fv,
+              ft = $scope.fv.field_type,
+              op = $scope.operation,
+              plan = $scope.plan,
+              op_type = op.operation_type,
+              route = op.routing;            
+
+          var sid = ft.array ? fv.sample_identifier : route[ft.routing];
+              aft = op.form[ft.role][fv.name].aft;
+
+          if ( aft && aft.sample_type && !AQ.sample_names_for(aft.sample_type.name).includes(sid) ) {
+            console.log("Invalid sample name: " + sid)
+            op.assign_sample(fv, null);
+            op.instantiate(plan,fv,null);
+            fv.clear_item(); 
+            fv.items=[];
+            $scope.$apply();
+          }
+
+        }
 
         $scope.$watch("operation.form[fv.field_type.role][fv.name].aft", function(new_aft, old_aft) {
 
           // Update autocomplete when aft changes
+
+          var fv = $scope.fv,
+              ft = $scope.fv.field_type,
+              op = $scope.operation,
+              plan = $scope.plan,
+              op_type = op.operation_type,
+              route = op.routing;            
 
           var aft = op.form[ft.role][fv.name].aft;                          
 
@@ -80,6 +105,8 @@
               source: AQ.sample_names_for(name),
 
               select: autocomp,
+
+              change: change,
 
               open: function(event, ui) {
               

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app='aquarium' ng-controller='layoutCtrl' ng-cloak style="overflow: hidden">
+<html ng-app='aquarium' ng-controller='layoutCtrl' ng-cloak style="overflow: hidden" ng-strict-di>
 
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -12,6 +12,9 @@
     <%= favicon_link_tag 'favicon.ico' %>      
 
   <script>
+
+    // set the environment name for use in cookies
+     aquarium_environment_name = '<%= Bioturk::Application.environment_name %>';
 
     $(function() {
       $('.scrollable').on('wheel', function ( e ) {
@@ -98,7 +101,7 @@
 
       <%= yield %>
 
-      <md-sidenav class="site-sidenav md-sidenav-left"  ng-show="true"
+      <md-sidenav class="site-sidenav md-sidenav-left no-print"  ng-show="true"
                   md-component-id="sidebar" hide-print md-disable-backdrop
                   md-is-locked-open="true" style="z-index: 1">
 
@@ -110,9 +113,11 @@
 
       <div class="content-container" layout="column" tabIndex="-1" flex>
 
-        <md-toolbar class="specific-toolbar not-scrollable">
+        <md-toolbar class="specific-toolbar not-scrollable" 
+                    <% if content_for? :no_specific_padding %>style="padding-right: 0px !important" <% end %> >
 
-          <div class="md-toolbar-tools">
+          <div class="md-toolbar-tools no-print" 
+               <% if content_for? :no_specific_padding %>style="padding-right: 0px !important" <% end %> >
 
             <h2 flex md-truncate>
               <%= yield :title %>
@@ -150,6 +155,15 @@
         <% else %>
           <md-content class='main scrollable'>
         <% end %>
+
+          <% if content_for? :show_errors %>
+            <div class="container-fluid">
+              <% flash.each do |key, value| %>
+                <div class="alert alert-<%= key %>"><%= value.class == Array ? value.join('<br />').html_safe : value %></div>
+              <% end %>
+            </div>
+          <% end %>
+
            <%= yield :main %>
         </md-content>
 

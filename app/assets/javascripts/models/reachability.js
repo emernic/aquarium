@@ -5,7 +5,11 @@ AQ.Plan.record_methods.reachable = function(a,b) {
   // Unmark all fvs
   plan.unmark();
 
-  return plan.reachable_aux(plan.parent_of(a),a,b);
+  if ( a.role == 'input' ) {
+    return plan.reachable_aux(plan.parent_of(a),a,b);
+  } else {
+    return plan.reachable_aux(plan.parent_of(b),b,a);    
+  }
 
 }
 
@@ -21,7 +25,7 @@ AQ.Plan.record_methods.unmark = function(a,b) {
 
 }
 
-AQ.Plan.record_methods.parent_of= function(x) {
+AQ.Plan.record_methods.parent_of = function(x) {
 
   var plan = this, 
       parent;

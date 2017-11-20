@@ -21,7 +21,7 @@ group :development do
 end
 
 group :production do
-  gem 'puma'  
+  gem 'puma'
 end
 
 # Gems used only for assets and not required
@@ -48,5 +48,6 @@ gem 'oj'
 gem 'angular_rails_csrf'
 
 gem 'rack-cors', :require => 'rack/cors'
-gem "sqlite3"
-gem "test-unit"
+
+gem 'yard'
+gem 'yard-activerecord'

@@ -63,8 +63,6 @@ AQ.Operation.record_getters.num_outputs = function() {
 
 AQ.Operation.record_methods.set_type_with_field_values = function(operation_type,fvs) {
 
-  console.log(["set_type_with_field_values", operation_type, fvs])
-
   var op = this;
   op.operation_type_id = operation_type.id;
   op.operation_type = operation_type;
@@ -158,7 +156,7 @@ AQ.Operation.record_methods.assign_sample = function(fv,sid) {
     fv.sample_identifier = sid;
   } 
 
-  op.recompute_getter("types_and_values")
+  op.recompute_getter("types_and_values")  
 
   return op;
 
@@ -298,7 +296,6 @@ AQ.Operation.record_methods.reload = function() {
 
 AQ.Operation.getter(AQ.Job,"job");
 
-
 AQ.Operation.record_methods.instantiate_aux = function(plan,pairs,resolve) {
 
   var operation = this;
@@ -330,17 +327,19 @@ AQ.Operation.record_methods.instantiate_aux = function(plan,pairs,resolve) {
 
 AQ.Operation.record_methods.instantiate = function(plan,field_value,sid) { // instantiate this operation's field values using the sid
                                                                            // assuming it is being assigned to the argument field_value
-  if ( sid ) {                                                             // will need to look at the field_value's routing information
+                                                                           // will need to look at the field_value's routing information
                                                                            // as well as its sample definition
-    var operation = this,
-        sample_id = AQ.id_from(sid);
+  var operation = this,
+      sample_id = AQ.id_from(sid);
 
-    aq.each(operation.field_values, fv => {
-      if ( !fv.field_type.array && fv.routing == field_value.routing ) {
-        operation.assign_sample(fv, sid);
-      }
-    })
+  aq.each(operation.field_values, fv => {
+    if ( !fv.field_type.array && fv.routing == field_value.routing ) {
+      operation.assign_sample(fv, sid);
+    }
+  })
 
+  if ( sid ) {
+    
     // Find items associated with samples
     aq.each(operation.field_values, fv => {
       if ( !fv.field_type.array && fv.routing == field_value.routing ) {
@@ -487,4 +486,60 @@ AQ.Operation.record_methods.set_status = function(status) {
 
 }
 
+AQ.Operation.record_methods.input_pin_x = function(fv) {
+  return this.x + this.width/2 + (fv.index - this.num_inputs/2.0 + 0.5)*AQ.snap;
+}
 
+AQ.Operation.record_methods.input_pin_y = function(fv) {
+  return this.y + this.height;
+}
+
+
+AQ.Operation.record_methods.output_pin_x = function(fv) {
+  return this.x + this.width/2 + (fv.index - this.num_outputs/2.0 + 0.5)*AQ.snap;  
+}
+
+AQ.Operation.record_methods.output_pin_y = function(fv) {
+  return this.y;
+}
+
+AQ.Operation.record_methods.role = function(fv) {
+  return fv.role;
+}
+
+AQ.Operation.step_all = function() {
+
+  return AQ.get("/operations/step");
+
+}
+
+AQ.Operation.manager_list = function(criteria,options) {
+        // AQ.Operation.where(criteria, {
+        //   methods: ['user', 'field_values', 'plans', 'jobs']
+        // }, options).
+
+  return new Promise(function(resolve,reject) {
+
+    AQ.post("/operations/manager_list", { criteria: criteria, options: options }).then(response => {
+      let ops = aq.collect(response.data, op => AQ.Operation.record(op));
+      aq.each(ops, op => { 
+        op.job = AQ.Job.record(op.job);
+        op.user = AQ.User.record(op.user);
+        op.plans = aq.collect(op.plans, plan => AQ.Plan.record(plan));
+        op.field_values = aq.collect(op.field_values, raw_fv => {
+          fv = AQ.FieldValue.record(raw_fv)
+          if ( fv.item ) { 
+            fv.item = AQ.Item.record(fv.item); 
+            fv.item.object_type = AQ.ObjectType.record(fv.item.object_type);
+          }
+          if ( fv.sample ) { fv.sample = AQ.Sample.record(fv.sample); }
+          return fv;
+        });
+        op.data_associations = aq.collect(op.data_associations, da => AQ.DataAssociation.record(da))
+      });
+      resolve(ops)
+    })
+
+  });      
+
+}

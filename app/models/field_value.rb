@@ -1,3 +1,5 @@
+# An input, output, or parameter of an {Operation}
+
 class FieldValue < ActiveRecord::Base
 
   include FieldValuePlanner
@@ -13,14 +15,23 @@ class FieldValue < ActiveRecord::Base
   attr_accessible :field_type_id, :row, :column, :allowable_field_type_id
   attr_accessible :parent_class, :parent_id
 
+  # Return associated {Sample}
+  #
+  # @return [Sample]
   def sample
     child_sample
   end
 
+  # Return associated {Item}
+  #
+  # @return [Item]
   def item
     child_item
   end
 
+  # Return associated {Collection}
+  #
+  # @return [Collection]
   def collection
     if child_item
       Collection.find(child_item.id)
@@ -29,6 +40,11 @@ class FieldValue < ActiveRecord::Base
     end
   end
 
+  # Return associated parameter value.
+  #
+  # @return [Float, String, Hash, Sample, Item] The value of the
+  #   {FieldValue} of the type specified in the operation type
+  #   definition
   def val
 
     if field_type
@@ -188,21 +204,6 @@ class FieldValue < ActiveRecord::Base
 
   end
 
-  def as_json(options={})
-    # , methods: [ :wires_as_source, :wires_as_dest ] 
-    super( include: [ 
-      :child_sample, 
-      :wires_as_source, 
-      :wires_as_dest, 
-      allowable_field_type: { 
-        include: [ 
-          :object_type, 
-          :sample_type 
-        ]
-      } 
-    ] )
-  end
-
   def export
     attributes.merge({
       child_sample: child_sample.as_json,
@@ -226,6 +227,18 @@ class FieldValue < ActiveRecord::Base
     end
   end
 
+  # Set {Item}, {Collection}, or row or column
+  # 
+  # @param opts [Hash]
+  # @option opts [Item] :item
+  # @option opts [Collection] :collection
+  # @option opts [Integer] :row
+  # @option opts [Integer] :column
+  # @example For debugging, set input to specific plate
+  #  if debug
+  #    plate = Item.find(125234)
+  #    operations.first.input("Plate").set item: plate if plate
+  #  end
   def set opts={}
     self.child_item_id = opts[:item].id if opts[:item]   
     self.child_item_id = opts[:collection].id if opts[:collection]
@@ -245,5 +258,19 @@ class FieldValue < ActiveRecord::Base
     ft = field_type
     ft ? ft.routing : nil
   end
+
+  def full_json(options={})
+    self.as_json( include: [ 
+      :child_sample, 
+      :wires_as_source, 
+      :wires_as_dest, 
+      allowable_field_type: { 
+        include: [ 
+          :object_type, 
+          :sample_type 
+        ]
+      } 
+    ] )
+  end  
 
 end 

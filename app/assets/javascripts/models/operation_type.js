@@ -57,41 +57,33 @@ AQ.OperationType.all_with_content = function(deployed) {
 
 }
 
-AQ.OperationType.all_with_field_types = function(deployed) {
+AQ.OperationType.deployed_with_timing = function() {
 
-  if ( deployed ) {
+  return new Promise(function(resolve, reject) {
+    
+    AQ.get("/operation_types/deployed_with_timing").then(raw_ots => {
 
-    return this.array_query(
-        'where', {deployed: true}, 
-        { methods: [ 'field_types' ] }
-      ).then((ots) => {
-        aq.each(ots,function(ot) { 
-          ot.upgrade_field_types();
-        })
-        return ots;
+      let ots = aq.collect(raw_ots.data, raw_ot => {
+        let ot = AQ.OperationType.record(raw_ot);
+        ot.timing = AQ.Timing.record(ot.timing);
+        return ot;        
       });
 
-  } else {
+      console.log(raw_ots)
 
-    return this.array_query(
-        'all', [], 
-        { methods: [ 'field_types' ] }
-      ).then((ots) => {
-        aq.each(ots,function(ot) { 
-          ot.upgrade_field_types();        
-        })
-        return ots;
-      });
+      resolve(ots);
 
-  }
+    })
+
+  });
 
 }
 
-AQ.OperationType.all_fast = function() {
+AQ.OperationType.all_fast = function(deployed_only=false) {
 
   return new Promise(function(resolve, reject) {
 
-    AQ.get("/plans/operation_types").then( response => {
+    AQ.get("/plans/operation_types/"+deployed_only).then( response => {
 
       ots = aq.collect(response.data, rot => {
         var ot = AQ.OperationType.record(rot);
@@ -106,6 +98,8 @@ AQ.OperationType.all_fast = function() {
   });
 
 }
+
+AQ.OperationType.all_with_field_types = AQ.OperationType.all_fast;
 
 AQ.OperationType.numbers = function(user,filter) {
 
@@ -201,28 +195,26 @@ AQ.OperationType.record_methods.unschedule = function(operations) {
 
 }
 
-AQ.OperationType.record_methods.code = function(name) {
+/*
+ * Returns the named component: protocol, documentation, cost_model, or precondition.
+ */
+AQ.OperationType.record_methods.code = function(component_name) {
 
-  var ot = this;
+  var operation_type = this;
 
-  delete ot[name];
-  ot[name]= { content: "Loading " + name, name: "name", no_edit: true };
+  delete operation_type[component_name];
+  operation_type[component_name]= { content: "Loading " + component_name, name: "name", no_edit: true };
 
-  AQ.Code.where({parent_class: "OperationType", parent_id: ot.id, name: name}).then(codes => {
+  AQ.Code.where({parent_class: "OperationType", parent_id: operation_type.id, name: component_name}).then(codes => {
     if ( codes.length > 0 ) {
-      latest = aq.where(codes,code => { return code.child_id == null });
-      if ( latest.length >= 1 ) {
-        ot[name] = latest[0];
-      } else {
-        ot[name]= { content: "# Add code here.", name: "name" };
-      }
+      operation_type[component_name] = codes[codes.length-1];
     } else { 
-      ot[name]= { content: "# Add code here.", name: "name" };
+      operation_type[component_name]= { content: "# Add code here.", name: "name" };
     }
     AQ.update();
   });
 
-  return ot[name];
+  return operation_type[component_name];
 
 }
 

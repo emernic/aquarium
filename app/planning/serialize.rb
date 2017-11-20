@@ -54,14 +54,16 @@ module Serialize
       updated_at: plan.updated_at,
       status: plan.status,
       operations: sops,
-      wires: wires
+      wires: wires,
+      layout: plan.layout
     }
 
   end
 
-  def self.fast_operation_types dep=true
+  def self.fast_operation_types dep_only=true
 
-    ots = OperationType.where(deployed: dep)
+    ots = OperationType
+    ots = ots.where(deployed: true) if dep_only
     ot_ids = ots.collect { |ot| ot.id }
     fts = FieldType.includes(:allowable_field_types).where(parent_class: "OperationType", parent_id: ot_ids)
     st_ids = fts.collect { |ft| ft.allowable_field_types.collect { |aft| aft.sample_type_id }}.flatten
