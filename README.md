@@ -1,6 +1,12 @@
 AQUARIUM
 =========
 
+**Justin's Install**
+Mission: Make installation of Aquarium easy
+
+Documentation
+-------------
+
 * [Installation](doc/Installation.md) : How to install Aquarium
 * [Plankton](doc/Plankton.md) : The protocol programming language.
 * [Oyster](doc/Oyster.md) : The process control language.
