@@ -55,7 +55,7 @@
              </a>
            </li>
 
-           <li ng-show="sample.inventory" class='dropdown-submenu pull-left'>
+           <li ng-show="sample.inventory" class='dropdown-submenu pull-left' ng-if="<%= current_user.is_admin %>">
              <a tabindex="-1" href="#">New Item</a>
              <ul class='dropdown-menu dropdown-in-stl'>
                <li ng-repeat="container in sample.sample_type.object_types"

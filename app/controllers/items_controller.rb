@@ -8,18 +8,17 @@ class ItemsController < ApplicationController
 
       respond_to do |format|
         format.html # index.html.erb
-        format.json { render json: CollectionsDatatable.new(view_context) }
+        format.json { render json: CollectionsDatatable.new(view_context)}
       end
 
     else
 
       respond_to do |format|
         format.html # index.html.erb
-        format.json { render json: ItemsDatatable.new(view_context) }
+        format.json { render json: ItemsDatatable.new(view_context)}
       end
 
     end
-
   end
 
   def show

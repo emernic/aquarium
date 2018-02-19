@@ -1,0 +1,14 @@
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/json-1.8.3/ext/json
+/usr/local/rvm/rubies/ruby-2.0.0-p648/bin/ruby -r ./siteconf20170614-5487-tbkzrc.rb extconf.rb
+creating Makefile
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/json-1.8.3/ext/json
+make "DESTDIR=" clean
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/json-1.8.3/ext/json
+make "DESTDIR="
+make: Nothing to be done for `all'.
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/json-1.8.3/ext/json
+make "DESTDIR=" install
+installing default libraries

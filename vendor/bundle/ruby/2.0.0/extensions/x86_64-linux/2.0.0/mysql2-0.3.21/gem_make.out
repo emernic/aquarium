@@ -1,0 +1,38 @@
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/mysql2-0.3.21/ext/mysql2
+/usr/local/rvm/rubies/ruby-2.0.0-p648/bin/ruby -r ./siteconf20170614-6341-1n2kxy8.rb extconf.rb
+checking for ruby/thread.h... yes
+checking for rb_thread_call_without_gvl() in ruby/thread.h... yes
+checking for rb_thread_blocking_region()... yes
+checking for rb_wait_for_single_fd()... yes
+checking for rb_hash_dup()... yes
+checking for rb_intern3()... yes
+-----
+Using mysql_config at /usr/bin/mysql_config
+-----
+checking for mysql.h... yes
+checking for errmsg.h... yes
+checking for mysqld_error.h... yes
+-----
+Setting libpath to /usr/lib64/mysql56
+-----
+creating Makefile
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/mysql2-0.3.21/ext/mysql2
+make "DESTDIR=" clean
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/mysql2-0.3.21/ext/mysql2
+make "DESTDIR="
+compiling mysql2_ext.c
+compiling infile.c
+compiling result.c
+result.c: In function ‘msec_char_to_uint’:
+result.c:189:17: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (i = 0; i < (len - 1); i++) {
+                 ^
+compiling client.c
+linking shared-object mysql2/mysql2.so
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/mysql2-0.3.21/ext/mysql2
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 mysql2.so ./.gem.20170614-6341-1l000b0/mysql2
+installing default mysql2 libraries

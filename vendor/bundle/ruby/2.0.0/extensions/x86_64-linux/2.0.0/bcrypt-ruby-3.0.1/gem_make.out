@@ -1,0 +1,32 @@
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/bcrypt-ruby-3.0.1/ext/mri
+/usr/local/rvm/rubies/ruby-2.0.0-p648/bin/ruby -r ./siteconf20170614-5487-443h62.rb extconf.rb
+creating Makefile
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/bcrypt-ruby-3.0.1/ext/mri
+make "DESTDIR=" clean
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/bcrypt-ruby-3.0.1/ext/mri
+make "DESTDIR="
+compiling bcrypt_ext.c
+bcrypt_ext.c: In function ‘bcrypt_wrapper’:
+bcrypt_ext.c:27:5: warning: implicit declaration of function ‘ruby_bcrypt’ [-Wimplicit-function-declaration]
+     return (VALUE)ruby_bcrypt(args->output, args->key, args->salt);
+     ^
+bcrypt_ext.c: At top level:
+bcrypt_ext.c:25:14: warning: ‘bcrypt_wrapper’ defined but not used [-Wunused-function]
+ static VALUE bcrypt_wrapper(void *_args) {
+              ^
+compiling crypt_blowfish.c
+compiling crypt.c
+compiling wrapper.c
+In file included from wrapper.c:27:0:
+/usr/local/rvm/rubies/ruby-2.0.0-p648/include/ruby-2.0.0/ruby/backward/util.h:2:2: warning: #warning use "ruby/util.h" instead of bare "util.h" [-Wcpp]
+ #warning use "ruby/util.h" instead of bare "util.h"
+  ^
+compiling crypt_gensalt.c
+linking shared-object bcrypt_ext.so
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/bcrypt-ruby-3.0.1/ext/mri
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 bcrypt_ext.so ./.gem.20170614-5487-hxytc2
+installing default bcrypt_ext libraries

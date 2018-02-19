@@ -54,7 +54,7 @@
           <div flex="20" class='md-body-2'>Location</div>
           <div flex="60"><input type='text' class='location-input'
                                 ng-model="item.new_location"></div>
-          <div flex="20" class='buttons'>
+          <div flex="20" class='buttons' ng-if="<%= current_user.is_admin %> || (item.sample && <%= current_user.id %> == item.sample.user_id)">
             <a href="#" ng-click="item.move(item.new_location)" ng-if="item.new_location != item.location">
               <ng-md-icon icon="system_update_alt" size="22" aria-label="Update Location" style="fill: #444"></ng-md-icon>
             </a>
@@ -62,14 +62,18 @@
               <ng-md-icon icon="undo" size="22" aria-label="Undo" style="fill: #444"></ng-md-icon>  
             </a>
             <% if current_user && current_user.is_admin %>
-              <a href="#" ng-click="item.mark_as_deleted()" class="no-highlight">
-                <ng-md-icon icon="delete" size="22" aria-label="Delete" style="fill: #444"></ng-md-icon>  
-              </a>   
-            <% end %>      
+		<a href="#" ng-click="item.mark_as_deleted()" class="no-highlight">
+               	<ng-md-icon icon="delete" size="22" aria-label="Delete" style="fill: red"></ng-md-icon>  
+		</a>
+	    <% end %>
+ 
+	    <a href="#" ng-click="item.request_delete()" >
+               	<ng-md-icon icon="delete" size="22" aria-label="Request delete" style="fill: #444"></ng-md-icon>  
+	    </a>
           </div>
         </div>
 
-        <div class='data-associations'>
+        <div class='data-associations' ng-if="<%= current_user.is_admin %> || (item.sample && <%= current_user.id %> == item.sample.user_id)">
           <da record="item"></da>  
           <br>
           <div layout="row" layout-align="center center">

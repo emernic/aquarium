@@ -1,0 +1,35 @@
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/oj-2.15.0/ext/oj
+/usr/local/rvm/rubies/ruby-2.0.0-p648/bin/ruby -r ./siteconf20170614-5487-1ndllmi.rb extconf.rb
+>>>>> Creating Makefile for ruby version 2.0.0 on x86_64-linux <<<<<
+creating Makefile
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/oj-2.15.0/ext/oj
+make "DESTDIR=" clean
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/oj-2.15.0/ext/oj
+make "DESTDIR="
+compiling odd.c
+compiling compat.c
+compiling err.c
+compiling hash_test.c
+compiling sparse.c
+compiling fast.c
+compiling strict.c
+compiling oj.c
+compiling reader.c
+compiling val_stack.c
+compiling resolve.c
+compiling object.c
+compiling parse.c
+compiling cache8.c
+compiling circarray.c
+compiling hash.c
+compiling scp.c
+compiling dump.c
+compiling saj.c
+linking shared-object oj/oj.so
+
+current directory: /var/www/damplab/aquarium/damplab-aquarium/vendor/bundle/ruby/2.0.0/gems/oj-2.15.0/ext/oj
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 oj.so ./.gem.20170614-5487-1rdfk2f/oj
+installing default oj libraries
