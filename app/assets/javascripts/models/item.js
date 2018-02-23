@@ -116,6 +116,34 @@ AQ.Item.record_methods.request_delete = function() {
     .catch(() => { da.object = old_object; })
 }
 
+
+AQ.Item.record_methods.approve_sequencing = function() {
+
+  var item = this;
+
+  var da = AQ.DataAssociation.record({
+    unsaved: true,
+    key: "sequencing_approved",
+    value:"Sequencing results for this item have been approved by the user." ,
+    new_value: "Sequencing results for this item have been approved by the user.",
+    parent_class: item.model.model,
+    parent_id: item.id
+  });
+
+  if ( typeof item.data_associations === "object" ) {
+    item.data_associations.push(da);
+  }
+
+  var temp = {},
+  old_object = da.object;
+  temp[da.key] = da.new_value;
+  da.object = JSON.stringify(temp);
+  da.new_value = "Sequencing results for this item have been approved by the user."
+  da.save()
+    .then(() => { da.value = da.new_value, AQ.update() })
+    .catch(() => { da.object = old_object; })
+}
+
 AQ.Item.record_methods.get_history = function() {
 
   var item = this;
@@ -143,3 +171,13 @@ AQ.Item.record_getters.history = function() {
   return item.history;
 }
 
+AQ.Item.record_getters.has_sequencing = function() {
+  var item = this;
+  console.log("Reached function AQ.Item.record_gettters.has_sequencing...");
+  console.log(item.data_associations);
+  if (item.data_associations.some( da => da.key === "sequencing_results")) {
+    return true;
+  } else {
+    return false;
+  }
+}
