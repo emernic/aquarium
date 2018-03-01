@@ -28,6 +28,7 @@ Gemfile.lock
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
+/log/*.log.0
 /tmp
 /public/assets
 
