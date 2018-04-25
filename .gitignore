@@ -65,8 +65,8 @@ public/components
 
 .DS_Store
 
-
-
+# ignore config file for google sheets (contains authentication secret)
+google_sheets_config.json
 
 
 
