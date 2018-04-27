@@ -15,6 +15,8 @@ class Sample < ActiveRecord::Base
 
   attr_accessible :name, :user_id, :project, :sample_type_id, :user_id, :description
 
+  has_paper_trail on: [:update, :destroy]
+
   belongs_to :sample_type
   belongs_to :user
   has_many :items

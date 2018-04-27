@@ -4,6 +4,8 @@ class DataAssociation < ActiveRecord::Base
   belongs_to :upload
   attr_accessible :parent_class, :key, :object, :parent_id, :upload_id
 
+  has_paper_trail on: [:update, :destroy]
+
   def full_object
     begin
       HashWithIndifferentAccess.new(JSON.parse object, symbolize_names: true)    

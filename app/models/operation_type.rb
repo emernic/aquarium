@@ -14,6 +14,8 @@ class OperationType < ActiveRecord::Base
 
   attr_accessible :name, :category, :deployed, :on_the_fly
 
+  has_paper_trail on: [:update, :destroy]
+
   validates :name, presence: true
   validates :category, presence: true
 

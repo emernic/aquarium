@@ -60,3 +60,5 @@ gem 'yard'
 gem 'yard-activerecord'
 
 gem 'google_drive'
+
+gem 'paper_trail'

@@ -25,6 +25,11 @@ class Item < ActiveRecord::Base
 
   accepts_nested_attributes_for :sample, :object_type
 
+ # version control ######################################################
+
+ 
+  has_paper_trail on: [:update, :destroy]
+
   # validations #########################################################
 
 

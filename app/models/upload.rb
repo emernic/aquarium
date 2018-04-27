@@ -5,6 +5,8 @@ class Upload < ActiveRecord::Base
   has_attached_file :upload
   do_not_validate_attachment_file_type :upload
 
+  has_paper_trail on: [:update, :destroy]
+
   belongs_to :job
   has_many :data_associations
 

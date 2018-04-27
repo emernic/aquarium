@@ -7,6 +7,8 @@ class SampleType < ActiveRecord::Base
 
   attr_accessible :description, :name
 
+  has_paper_trail on: [:update, :destroy]
+
   has_many :samples
   has_many :object_types
 

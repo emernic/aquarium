@@ -5,6 +5,8 @@ class Job < ActiveRecord::Base
   attr_accessible :arguments, :sha, :state, :user_id, :pc, :submitted_by, :group_id, 
                   :desired_start_time, :latest_start_time, :metacol_id, :successor
 
+  has_paper_trail on: [:update, :destroy]
+
   has_many :job_associations
   # has_many :operations, through: :jobs_associations # not working for some reason
   def operations

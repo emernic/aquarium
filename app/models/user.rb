@@ -3,6 +3,9 @@ class User < ActiveRecord::Base
   include Budgeting
 
   attr_accessible :login, :name, :password, :password_confirmation, :password_digest, :key
+
+  has_paper_trail on: [:update, :destroy]
+
   has_secure_password
   has_many :samples
   has_many :logs
