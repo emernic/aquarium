@@ -1,5 +1,7 @@
 class TaskPrototypesController < ApplicationController
 
+  before_action :set_paper_trail_whodunnit
+
   before_filter :signed_in_user
   
   # GET /task_prototypes

@@ -1,6 +1,8 @@
 
 class ObjectTypesController < ApplicationController
 
+  before_action :set_paper_trail_whodunnit
+
   helper ObjectTypesHelper
 
   before_filter :signed_in_user

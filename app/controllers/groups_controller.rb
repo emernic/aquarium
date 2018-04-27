@@ -1,5 +1,7 @@
 class GroupsController < ApplicationController
 
+  before_action :set_paper_trail_whodunnit
+
   before_filter :signed_in_user
   before_filter :up_to_date_user  
   

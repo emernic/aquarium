@@ -1,5 +1,7 @@
 class JsonController < ApplicationController
 
+  before_action :set_paper_trail_whodunnit
+
   before_filter :signed_in_user
 
   def method_ok m
