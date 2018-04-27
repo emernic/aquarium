@@ -58,3 +58,4 @@ gem 'github-markup'
 gem 'yard'
 gem 'yard-activerecord'
 
+gem 'paper_trail', '~>5.0'

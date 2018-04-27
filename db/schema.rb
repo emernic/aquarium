@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20171103151518) do
+ActiveRecord::Schema.define(:version => 20180427030853) do
 
   create_table "account_logs", :force => true do |t|
     t.integer  "row1"
@@ -464,6 +464,17 @@ ActiveRecord::Schema.define(:version => 20171103151518) do
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
   add_index "users", ["remember_token"], :name => "index_users_on_remember_token"
+
+  create_table "versions", :force => true do |t|
+    t.string   "item_type",  :limit => 191,        :null => false
+    t.integer  "item_id",                          :null => false
+    t.string   "event",                            :null => false
+    t.string   "whodunnit"
+    t.text     "object",     :limit => 2147483647
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
 
   create_table "wires", :force => true do |t|
     t.integer  "from_id"

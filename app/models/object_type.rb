@@ -5,6 +5,8 @@ class ObjectType < ActiveRecord::Base
                   :vendor, :unit, :image, :cost, :release_method, :release_description,
                   :sample_type_id, :created_at, :prefix
 
+  has_paper_trail on: [:update, :destroy]
+
   belongs_to :sample_type
 
   validates :name, :presence => true

@@ -1,5 +1,7 @@
 class ItemsController < ApplicationController
 
+  before_filter :set_paper_trail_whodunnit
+
   before_filter :signed_in_user
 
   def index

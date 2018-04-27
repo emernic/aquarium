@@ -1,5 +1,7 @@
 class SessionsController < ApplicationController
 
+  before_filter :set_paper_trail_whodunnit
+
   def new
     render layout: "blank.html.erb"
   end

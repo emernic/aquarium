@@ -23,6 +23,8 @@
 
   attr_accessible :status, :user_id, :x, :y, :parent_id
 
+  has_paper_trail on: [:update, :destroy]
+
   def virtual?
     false
   end

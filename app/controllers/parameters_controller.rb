@@ -1,5 +1,7 @@
 class ParametersController < ApplicationController
 
+  before_filter :set_paper_trail_whodunnit
+
   before_filter :up_to_date_user    
 
   before_filter {
